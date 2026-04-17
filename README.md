@@ -1,147 +1,143 @@
-# [CVPR 2025] SegMAN: Omni-scale Context Modeling with State Space Models and Local Attention for Semantic Segmentation
+# SegMAN 项目总结
 
-Official Pytorch implementation of [SegMAN: Omni-scale Context Modeling with State Space Models
-and Local Attention for Semantic Segmentation](https://arxiv.org/abs/2412.11890)
+本文档概括 **`mamba-main/SegMAN-main/SegMAN-main`** 仓库的定位、依赖、官方论文结果，以及本环境中 **DataA / DataB 二分类语义分割** 的 **测试集评估 JSON** 与相关实验说明。更细的环境与命令见同目录下的 [`SEGMAN_EXPERIMENT_SETUP.md`](SEGMAN_EXPERIMENT_SETUP.md) 与 [`README.md`](README.md)。
 
-![SegMAN](assets/model.png)
+---
 
-## Main Results
+## 1. 项目是什么
 
-<img src="assets/SegMAN_performance.png" width="90%" />
+**SegMAN**（**Seg**mentation with **M**amba and **A**ttention **N**etwork）是 **CVPR 2025** 官方 PyTorch 实现，论文题目为 *SegMAN: Omni-scale Context Modeling with State Space Models and Local Attention for Semantic Segmentation*。
 
-<img src="assets/SegMAN_semantic_segmentation_performance.png" width="90%" />
+- **论文 / 预印本**：[arXiv:2412.11890](https://arxiv.org/abs/2412.11890)  
+- **核心思想**：在语义分割中结合 **状态空间模型（SSM）** 与 **局部注意力（NATTEN 等）**，做多尺度上下文建模；分割框架基于 **MMSegmentation v0.30.0**。
 
-## Installation and data preparation
+仓库根目录主要包含：
 
-**Step 1:**  Create a new environment
-```shell
-conda create -n segman python=3.10
-conda activate segman
+| 路径 | 说明 |
+|------|------|
+| `segmentation/` | MMSeg 工程与训练、测试、配置（**日常命令在此目录执行**） |
+| `kernels/selective_scan/` | VMamba 风格的 **Selective Scan 2D** CUDA 扩展，需本地编译安装 |
+| `assets/` | 论文配图（模型结构、主结果图等） |
+| `pretrained/` | ImageNet-1k 预训练骨干权重放置位置（如 `SegMAN_Encoder_t.pth.tar`） |
 
-pip install torch==2.1.2 torchvision==0.16.2
-```
-**Step 2:** Install [MMSegmentation v0.30.0](https://github.com/open-mmlab/mmsegmentation/tree/v0.30.0) by following the [installation guidelines](https://github.com/open-mmlab/mmsegmentation/blob/v0.30.0/docs/en/get_started.md) and prepare segmentation datasets by following [data preparation](https://github.com/open-mmlab/mmsegmentation/blob/v0.30.0/docs/en/dataset_prepare.md).
-The following installation commands works for me:
-```
-pip install -U openmim
-mim install mmcv-full
-cd segmentation
-pip install -v -e .
-```
+实现致谢与依赖栈：**MMSegmentation**、**Natten**、**VMamba**、**SegFormer** 等（详见 `README.md`）。
 
-To support torch>=2.1.0, you also need to import ```from packaging import version``` and replace ```Line 75``` of ```/miniconda3/envs/segman/lib/python3.10/site-packages/mmcv/parallel/_functions.py``` with the following:
-```
-if version.parse(torch.__version__) >= version.parse('2.1.0'):
-    streams = [_get_stream(torch.device("cuda", device)) for device in target_gpus]
-else:
-    streams = [_get_stream(device) for device in target_gpus]
-```
-**Step 3:** Install dependencies using the following commands.
+---
 
-To install [Natten](https://github.com/SHI-Labs/NATTEN), you should modify the following with your PyTorch and CUDA versions accordingly.
-```shell
-pip install natten==0.17.3+torch210cu121 -f https://shi-labs.com/natten/wheels/
-```
+## 2. 环境与依赖要点
 
-The [Selective Scan 2D](https://github.com/MzeroMiko/VMamba) can be install with:
-```shell
-cd kernels/selective_scan && pip install .
-```
+- **Python**：建议 3.10（`README` / `SEGMAN_EXPERIMENT_SETUP` 一致）。  
+- **PyTorch**：示例为 `torch==2.1.2` + 对应 `torchvision`；若 **torch ≥ 2.1**，需按 `README` 修改 mmcv 中 `_functions.py` 一处（避免多卡 stream 报错）。  
+- **MMSegmentation**：**v0.30.0**；通过 `openmim` 安装 `mmcv-full` 后，在 `segmentation` 下 `pip install -v -e .`。  
+- **Natten**：须与 CUDA / PyTorch 版本匹配的 wheel（见 `README`）。  
+- **selective_scan**：`cd kernels/selective_scan && pip install .`（需可用 CUDA 编译环境）。  
+- **其他**：`requirements.txt` 中列出 `mmcv-full==1.7.2`、`mmengine` 等；二分类实验说明中强调 **NumPy 1.x** 与数据路径（`DataA-B/DataA`、`DataB`）见 `SEGMAN_EXPERIMENT_SETUP.md`。
 
-Install other requirements:
-```shell
-pip install -r requirements.txt
-```
+---
 
-## Training
-Download the ImageNet-1k pretrained weights [here](https://drive.google.com/drive/folders/1QYU7nhpe0ddH7bPxI7VH4drc__07uEHs?usp=sharing) and put them in a folder ```pretrained/```. Navigate to the segmentation directory:
-```shell
-cd segmentation
-```
-Scripts to reproduce our paper results are provided in ```./scripts```
-Example training script for ```SegMAN-B``` on ```ADE20K```:
-```shell
-# Single-gpu
-python tools/train.py local_configs/segman/base/segman_b_ade.py --work-dir outputs/EXP_NAME
+## 3. 官方论文表格结果（标准数据集）
 
-# Multi-gpu
-bash tools/dist_train.sh local_configs/segman/base/segman_b_ade.py <GPU_NUM> --work-dir outputs/EXP_NAME
-```
+以下为仓库 `README.md` 中公开的 **单尺度语义分割 mIoU** 及参数量、FLOPs（与论文 / 官方权重一致，便于与文献对比）。
 
-## Evaluation
-Download `trained weights` for segmentation models at [google drive](https://drive.google.com/drive/folders/1C2bmb7KP7mECm9c04NCrUAJQGsEf_bQ4?usp=sharing). Navigate to the segmentation directory:
-```shell
-cd segmentation
-```
+### 3.1 ADE20K
 
-Example for evaluating ```SegMAN-B``` on ```ADE20K```:
-```
-# Single-gpu
-python tools/test.py local_configs/segman/base/segman_b_ade.py /path/to/checkpoint_file
+| 模型 | 骨干 (ImageNet Top-1) | mIoU | Params | FLOPs |
+|------|------------------------|------|--------|-------|
+| SegMAN-T | Encoder-T (76.2) | 43.0 | 6.4M | 6.2G |
+| SegMAN-S | Encoder-S (84.0) | 51.3 | 29.4M | 25.3G |
+| SegMAN-B | Encoder-B (85.1) | 52.6 | 51.8M | 58.1G |
+| SegMAN-L | Encoder-L (85.5) | 53.2 | 92.6M | 97.1G |
 
-# Multi-gpu
-bash tools/dist_test.sh local_configs/segman/base/segman_b_ade.py /path/to/checkpoint_file <GPU_NUM>
-```
+### 3.2 Cityscapes
 
-### ADE20K
+| 模型 | 骨干 (ImageNet Top-1) | mIoU | Params | FLOPs |
+|------|------------------------|------|--------|-------|
+| SegMAN-T | Encoder-T (76.2) | 80.3 | 6.4M | 52.5G |
+| SegMAN-S | Encoder-S (84.0) | 83.2 | 29.4M | 218.4G |
+| SegMAN-B | Encoder-B (85.1) | 83.8 | 51.8M | 479.0G |
+| SegMAN-L | Encoder-L (85.5) | 84.2 | 92.6M | 769.0G |
 
-|Model|Backbone (ImageNet-1k Top1 Acc)|mIoU|Params|FLOPs|Config|Download|
-|-----------|--------------------------------|------|--------|--------|------------------------------------------------------------------------|--------------------------------------------------------------------------|
-|SegMAN-T|SegMAN Encoder-T (76.2)| 43.0 | 6.4M | 6.2G | [config](segmentation/local_configs/segman/tiny/segman_t_ade.py)  | [Google Drive](https://drive.google.com/file/d/1d0wp7C83YjImeQmL5_CIo1qMRjPd_-8a/view?usp=sharing) |
-|  SegMAN-S  |     SegMAN Encoder-S (84.0)  | 51.3  | 29.4M | 25.3G | [config](segmentation/local_configs/segman/small/segman_s_ade.py)  | [Google Drive](https://drive.google.com/file/d/1VguPfxr_XSLWFuhopb0Ff-oA9QJGZMD7/view?usp=sharing) |
-|  SegMAN-B  |     SegMAN Encoder-B (85.1)  | 52.6  | 51.8M | 58.1G | [config](segmentation/local_configs/segman/base/segman_b_ade.py)  | [Google Drive](https://drive.google.com/file/d/19C1lpTTqHZZvLdf4SbKcp8SMiIDPQcoO/view?usp=sharing) |
-|  SegMAN-L  |     SegMAN Encoder-L (85.5)  |  53.2 | 92.6M | 97.1G | [config](segmentation/local_configs/segman/large/segman_l_ade.py)  | [Google Drive](https://drive.google.com/file/d/18OFmbr8rklYXqO93tU9UDYKsmobGFSR6/view?usp=sharing) |
+### 3.3 COCO-Stuff-164K
 
-### Cityscapes
+| 模型 | 骨干 (ImageNet Top-1) | mIoU | Params | FLOPs |
+|------|------------------------|------|--------|-------|
+| SegMAN-T | Encoder-T (76.2) | 41.3 | 6.4M | 6.2G |
+| SegMAN-S | Encoder-S (84.0) | 47.5 | 29.4M | 25.3G |
+| SegMAN-B | Encoder-B (85.1) | 48.4 | 51.8M | 58.1G |
+| SegMAN-L | Encoder-L (85.5) | 48.8 | 92.6M | 97.1G |
 
-|   Model  |    Backbone (ImageNet-1k Top1 Acc)     | mIoU | Params | FLOPs  | Config | Download  |
-|-----------|--------------------------------|------|--------|--------|------------------------------------------------------------------------|--------------------------------------------------------------------------|
-|  SegMAN-T  |     SegMAN Encoder-T 76.2)   | 80.3 | 6.4M | 52.5G | [config](segmentation/local_configs/segman/tiny/segman_t_cityscapes.py)  | [Google Drive](https://drive.google.com/file/d/1GivXciIZ7hdDsY0IDvV-v1dejGCK2VLX/view?usp=sharing) |
-|  SegMAN-S  |     SegMAN Encoder-S (84.0)  | 83.2  | 29.4M | 218.4G | [config](segmentation/local_configs/segman/small/segman_s_cityscapes.py)  | [Google Drive](https://drive.google.com/file/d/1VOpcMY9rTiHcx13nkFYLlX6llxAAZTEK/view?usp=sharing) |
-|  SegMAN-B  |     SegMAN Encoder-B (85.1)  | 83.8  | 51.8M | 479.0G | [config](segmentation/local_configs/segman/base/segman_b_cityscapes.py)  | [Google Drive](https://drive.google.com/file/d/1k34JM9WVBYBIcCv8FOKvDUAHPDhjj00t/view?usp=sharing) |
-|  SegMAN-L  |     SegMAN Encoder-L (85.5)  |  84.2 | 92.6M | 769.0G | [config](segmentation/local_configs/segman/large/segman_l_cityscapes.py)  | [Google Drive](https://drive.google.com/file/d/1SPaXL-faXlZyEPXl5bILLMlHG0OaFo1j/view?usp=sharing) |
+权重与配置文件链接见原 [`README.md`](README.md) 表格。
 
-### COCO-Stuff
+---
 
-|   Model  |    Backbone (ImageNet-1k Top1 Acc)     | mIoU | Params | FLOPs  | Config | Download  |
-|-----------|--------------------------------|------|--------|--------|------------------------------------------------------------------------|--------------------------------------------------------------------------|
-|  SegMAN-T  |     SegMAN Encoder-T (76.2)   | 41.3 | 6.4M | 6.2G | [config](segmentation/local_configs/segman/tiny/segman_t_coco.py)  | [Google Drive](https://drive.google.com/file/d/18P-e5hxWkISfiDZRnNTMow2-Fphk4H4t/view?usp=sharing) |
-|  SegMAN-S  |     SegMAN Encoder-S (84.0)  | 47.5  | 29.4M | 25.3G | [config](segmentation/local_configs/segman/small/segman_s_coco.py)  | [Google Drive](https://drive.google.com/file/d/1LEa7PSs9H1yovjFp0Ylu-izqbje0LDDf/view?usp=sharing) |
-|  SegMAN-B  |     SegMAN Encoder-B (85.1)  | 48.4  | 51.8M | 58.1G | [config](segmentation/local_configs/segman/base/segman_b_coco.py)  | [Google Drive](https://drive.google.com/file/d/1NHnNSBMQOw3y4FzjS66XcBrf-v5BpM0b/view?usp=sharing) |
-|  SegMAN-L  |     SegMAN Encoder-L (85.5)  |  48.8 | 92.6M | 97.1G | [config](segmentation/local_configs/segman/large/segman_l_coco.py)  | [Google Drive](https://drive.google.com/file/d/18kVKvgZwESK-oixRpOjByg-97TWt8AA7/view?usp=sharing) |
+## 4. 本仓库内自定义二分类实验（DataA / DataB）
 
+在 `segmentation/local_configs/segman_binary/` 下提供 **512×512**、**前景 / 背景** 二分类配置（如 `segman_t_dataa_512_iou.py`、`segman_t_datab_512_iou.py`）。数据根目录默认指向与 TransNeXt 对比实验一致的 **`DataA-B/DataA`** 与 **`DataA-B/DataB`**（相对路径说明见 `SEGMAN_EXPERIMENT_SETUP.md`）。
 
-## Encoder Pre-training
-We provide scripts for pre-training the encoder from scratch.
+与 Mask2Former / TransNeXt 侧的约定对齐说明（双 checkpoint、按 IoU 或 val loss 存 best 等）同样写在 `SEGMAN_EXPERIMENT_SETUP.md`。
 
-**Step 1:** Download [ImageNet-1k](https://www.image-net.org/download.php) and using this [script](https://gist.github.com/BIGBALLON/8a71d225eff18d88e469e6ea9b39cef4) to extract it.
+---
 
-**Step 2:** Start training with
+## 5. 本环境测试集评估结果（`tools/test.py` 导出 JSON）
 
-```
-bash scripts/train_segman-s.sh
-``` 
+以下数值来自 **`segmentation/checkpoints/`** 下由 MMSeg 测试脚本写入的 **`eval_single_scale_*.json`**（**单尺度测试**；指标为 0–1 小数，**百分比 = 数值 × 100**）。
 
-## Visualization
-You can visualize segmentation results using pre-trained checkpoints with the following (under segmentation directory):
-```
-python image_demo.py \
-img_path \
-config_file \
-checkpoint_file \
---palette 'ade20k' \
---out-file segman_demo.png \
---device 'cuda:0'
-```
-Replace ```img_path```, ```config_file```, and ```checkpoint_file``` with the image and model you want to visualize. Select a ```palette``` from {ade20k, coco_stuff164k, cityscapes} that correspond to the dataset you want to visualize.
+### 5.1 DataB（配置：`segman_t_datab_512_iou.py`）
 
+**结果文件**：`segmentation/checkpoints/test_datab_iou61/eval_single_scale_20260417_141621.json`
 
-## Acknowledgements
+| 指标 | 数值 |
+|------|------|
+| aAcc | 0.9868 |
+| **mIoU** | **0.8703** |
+| mAcc | 0.9701 |
+| mFscore | 0.9266 |
+| mPrecision | 0.8911 |
+| mRecall | 0.9701 |
+| IoU.background | 0.9863 |
+| **IoU.foreground** | **0.7544** |
+| Acc.background | 0.9884 |
+| Acc.foreground | 0.9519 |
+| Fscore.foreground | 0.8600 |
+| Precision.foreground | 0.7844 |
+| Recall.foreground | 0.9519 |
 
-Our implementation is based on [MMSegmentaion](https://github.com/open-mmlab/mmsegmentation/tree/v0.24.1), [Natten](https://github.com/SHI-Labs/NATTEN), [VMamba](https://github.com/MzeroMiko/VMamba), and [SegFormer](https://github.com/NVlabs/SegFormer). We gratefully thank the authors.
+### 5.2 DataA（配置：`segman_t_dataa_512_iou.py`）
 
-## Citation
-```
+**结果文件**：`segmentation/checkpoints/test_dataa_iou63/eval_single_scale_20260417_141431.json`
+
+| 指标 | 数值 |
+|------|------|
+| aAcc | 0.9917 |
+| **mIoU** | **0.7365** |
+| mAcc | 0.9356 |
+| mFscore | 0.8229 |
+| mPrecision | 0.7573 |
+| mRecall | 0.9356 |
+| IoU.background | 0.9916 |
+| **IoU.foreground** | **0.4814** |
+| Acc.background | 0.9927 |
+| Acc.foreground | 0.8786 |
+| Fscore.foreground | 0.6500 |
+| Precision.foreground | 0.5158 |
+| Recall.foreground | 0.8786 |
+
+> **说明**：目录名中的 `iou61` / `iou63` 仅为文件夹命名习惯；**以对应 JSON 内 `metric` 为准**。若需复现测试，请使用与训练一致的 checkpoint，并在 `segmentation` 目录下执行 `README` 中的 `tools/test.py` 命令，指向上述 config 与权重。
+
+---
+
+## 6. 训练与测试命令索引
+
+- **训练**（官方 ADE20K 等）：`cd segmentation` 后使用 `tools/train.py` 或 `tools/dist_train.sh`（见 `README.md`）。  
+- **二分类 DataA/DataB**：见 `SEGMAN_EXPERIMENT_SETUP.md` 第八节示例命令。  
+- **测试 / 评估**：`tools/test.py` 或 `tools/dist_test.sh` + 配置文件 + checkpoint 路径（见 `README.md`）。  
+- **可视化**：`segmentation/image_demo.py`（`README.md`「Visualization」一节）。
+
+---
+
+## 7. 引用
+
+```bibtex
 @inproceedings{SegMAN,
     title={SegMAN: Omni-scale Context Modeling with State Space Models and Local Attention for Semantic Segmentation},
     author={Yunxiang Fu and Meng Lou and Yizhou Yu},
@@ -149,3 +145,7 @@ Our implementation is based on [MMSegmentaion](https://github.com/open-mmlab/mms
     year={2025}
 }
 ```
+
+---
+
+*文档生成依据：仓库 `README.md`、`SEGMAN_EXPERIMENT_SETUP.md`、`requirements.txt`，以及 `segmentation/checkpoints/test_*/*.json` 中的实测指标。*
