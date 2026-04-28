@@ -1,0 +1,21 @@
+{
+    "config": "/root/autodl-tmp/my_MambaVision-main/my_SegMAN-main-main/my_SegMAN-main-main/data/checkpoints1/train_20260428_101215/segman_t_dataa_256_scheme3.py",
+    "metric": {
+        "aAcc": 0.9851000000000001,
+        "mIoU": 0.6518,
+        "mAcc": 0.8901,
+        "mFscore": 0.7378,
+        "mPrecision": 0.6727,
+        "mRecall": 0.8901,
+        "IoU.background": 0.985,
+        "IoU.foreground": 0.3185000038146973,
+        "Acc.background": 0.9868000030517579,
+        "Acc.foreground": 0.7933000183105469,
+        "Fscore.background": 0.9923999786376954,
+        "Fscore.foreground": 0.48310001373291017,
+        "Precision.background": 0.9980999755859375,
+        "Precision.foreground": 0.3472999954223633,
+        "Recall.background": 0.9868000030517579,
+        "Recall.foreground": 0.7933000183105469
+    }
+}

@@ -1,0 +1,282 @@
+/root/autodl-tmp/conda_envs/segman/lib/python3.10/site-packages/mmcv/__init__.py:20: UserWarning: On January 1, 2023, MMCV will release v2.0.0, in which it will remove components related to the training process and add a data transformation module. In addition, it will rename the package names mmcv to mmcv-lite and mmcv-full to mmcv. See https://github.com/open-mmlab/mmcv/blob/master/docs/en/compatibility.md for more details.
+  warnings.warn(
+[transformers] Disabling PyTorch because PyTorch >= 2.4 is required but found 2.1.2+cu118
+[transformers] PyTorch was not found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+/root/autodl-tmp/conda_envs/segman/lib/python3.10/site-packages/timm/models/layers/__init__.py:49: FutureWarning: Importing from timm.models.layers is deprecated, please import via timm.layers
+  warnings.warn(f"Importing from {__name__} is deprecated, please import via timm.layers", FutureWarning)
+/root/autodl-tmp/conda_envs/segman/lib/python3.10/site-packages/timm/models/registry.py:4: FutureWarning: Importing from timm.models.registry is deprecated, please import via timm.models
+  warnings.warn(f"Importing from {__name__} is deprecated, please import via timm.models", FutureWarning)
+2026-04-28 15:35:45,185 - mmseg - INFO - Multi-processing start method is `None`
+2026-04-28 15:35:45,185 - mmseg - INFO - OpenCV num_threads is `16
+2026-04-28 15:35:45,185 - mmseg - INFO - OMP num threads is 16
+2026-04-28 15:35:45,185 - mmseg - INFO - MKL num threads is 16
+2026-04-28 15:35:45,187 - mmseg - INFO - Loaded 20 images
+/root/autodl-tmp/my_MambaVision-main/my_SegMAN-main-main/my_SegMAN-main-main/segmentation/mmseg/models/decode_heads/decode_head.py:96: UserWarning: For binary segmentation, we suggest using`out_channels = 1` to define the outputchannels of segmentor, and use `threshold`to convert seg_logist into a predictionapplying a threshold
+  warnings.warn('For binary segmentation, we suggest using'
+load checkpoint from local path: /root/autodl-tmp/my_MambaVision-main/my_SegMAN-main-main/my_SegMAN-main-main/data/checkpoints1/train_20260428_095310/best_val/IoU_epoch_83.pth
+EncoderDecoder(
+  (backbone): SegMANEncoder(
+    (patch_embed): Sequential(
+      (0): Conv2d(3, 16, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+      (1): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (2): GELU(approximate='none')
+      (3): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (4): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (5): GELU(approximate='none')
+      (6): Conv2d(16, 32, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+      (7): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (8): GELU(approximate='none')
+      (9): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      (10): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (layers): ModuleList(
+      (0): BasicLayer(
+        (rope): RoPE()
+        (blocks): ModuleList(
+          (0-1): 2 x Block(
+            (cpe1): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=32)
+            (norm1): LayerNorm2d((32,), eps=1e-06, elementwise_affine=True)
+            (token_mixer): Attention(
+              (qkv): Conv2d(32, 96, kernel_size=(1, 1), stride=(1, 1))
+              (lepe): Conv2d(32, 32, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=32)
+              (proj): Conv2d(32, 32, kernel_size=(1, 1), stride=(1, 1))
+              (dwconv): Sequential(
+                (0): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=32)
+                (1): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+              )
+              (ssm): VSSM()
+              (norm): LayerNorm2d((32,), eps=1e-06, elementwise_affine=True)
+              (rpb): ParameterList(  (0): Parameter containing: [torch.float32 of size 1x21x21])
+            )
+            (cpe2): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=32)
+            (norm2): LayerNorm2d((32,), eps=1e-06, elementwise_affine=True)
+            (mlp): FFN(
+              (fc1): Conv2d(32, 128, kernel_size=(1, 1), stride=(1, 1))
+              (act_layer): GELU(approximate='none')
+              (dwconv): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=128)
+              (fc2): Conv2d(128, 32, kernel_size=(1, 1), stride=(1, 1))
+              (drop): Identity()
+            )
+            (drop_path): Identity()
+            (layer_scale1): Identity()
+            (layer_scale2): Identity()
+          )
+        )
+      )
+      (1): Sequential(
+        (0): Conv2d(32, 64, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+        (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (2): BasicLayer(
+        (rope): RoPE()
+        (blocks): ModuleList(
+          (0-1): 2 x Block(
+            (cpe1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=64)
+            (norm1): LayerNorm2d((64,), eps=1e-06, elementwise_affine=True)
+            (token_mixer): Attention(
+              (qkv): Conv2d(64, 192, kernel_size=(1, 1), stride=(1, 1))
+              (lepe): Conv2d(64, 64, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=64)
+              (proj): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1))
+              (dwconv): Sequential(
+                (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=64)
+                (1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+              )
+              (ssm): VSSM()
+              (norm): LayerNorm2d((64,), eps=1e-06, elementwise_affine=True)
+              (rpb): ParameterList(  (0): Parameter containing: [torch.float32 of size 2x17x17])
+            )
+            (cpe2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=64)
+            (norm2): LayerNorm2d((64,), eps=1e-06, elementwise_affine=True)
+            (mlp): FFN(
+              (fc1): Conv2d(64, 256, kernel_size=(1, 1), stride=(1, 1))
+              (act_layer): GELU(approximate='none')
+              (dwconv): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=256)
+              (fc2): Conv2d(256, 64, kernel_size=(1, 1), stride=(1, 1))
+              (drop): Identity()
+            )
+            (drop_path): Identity()
+            (layer_scale1): Identity()
+            (layer_scale2): Identity()
+          )
+        )
+      )
+      (3): Sequential(
+        (0): Conv2d(64, 144, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+        (1): BatchNorm2d(144, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (4): BasicLayer(
+        (rope): RoPE()
+        (blocks): ModuleList(
+          (0-3): 4 x Block(
+            (cpe1): Conv2d(144, 144, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=144)
+            (norm1): LayerNorm2d((144,), eps=1e-06, elementwise_affine=True)
+            (token_mixer): Attention(
+              (qkv): Conv2d(144, 432, kernel_size=(1, 1), stride=(1, 1))
+              (lepe): Conv2d(144, 144, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=144)
+              (proj): Conv2d(144, 144, kernel_size=(1, 1), stride=(1, 1))
+              (dwconv): Sequential(
+                (0): Conv2d(144, 144, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=144)
+                (1): BatchNorm2d(144, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+              )
+              (ssm): VSSM()
+              (norm): LayerNorm2d((144,), eps=1e-06, elementwise_affine=True)
+              (rpb): ParameterList(  (0): Parameter containing: [torch.float32 of size 4x17x17])
+            )
+            (cpe2): Conv2d(144, 144, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=144)
+            (norm2): LayerNorm2d((144,), eps=1e-06, elementwise_affine=True)
+            (mlp): FFN(
+              (fc1): Conv2d(144, 432, kernel_size=(1, 1), stride=(1, 1))
+              (act_layer): GELU(approximate='none')
+              (dwconv): Conv2d(432, 432, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=432)
+              (fc2): Conv2d(432, 144, kernel_size=(1, 1), stride=(1, 1))
+              (drop): Identity()
+            )
+            (drop_path): Identity()
+            (layer_scale1): Identity()
+            (layer_scale2): Identity()
+          )
+        )
+      )
+      (5): Sequential(
+        (0): Conv2d(144, 192, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+        (1): BatchNorm2d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (6): BasicLayer(
+        (rope): RoPE()
+        (blocks): ModuleList(
+          (0-1): 2 x Block(
+            (cpe1): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=192)
+            (norm1): LayerNorm2d((192,), eps=1e-06, elementwise_affine=True)
+            (token_mixer): Attention(
+              (qkv): Conv2d(192, 576, kernel_size=(1, 1), stride=(1, 1))
+              (lepe): Conv2d(192, 192, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=192)
+              (proj): Conv2d(192, 192, kernel_size=(1, 1), stride=(1, 1))
+              (rpb): ParameterList(
+                  (0): Parameter containing: [torch.float32 of size 8x13x13]
+                  (1): Parameter containing: [torch.float32 of size 8x49x49]
+              )
+            )
+            (cpe2): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=192)
+            (norm2): LayerNorm2d((192,), eps=1e-06, elementwise_affine=True)
+            (mlp): FFN(
+              (fc1): Conv2d(192, 576, kernel_size=(1, 1), stride=(1, 1))
+              (act_layer): GELU(approximate='none')
+              (dwconv): Conv2d(576, 576, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=576)
+              (fc2): Conv2d(576, 192, kernel_size=(1, 1), stride=(1, 1))
+              (drop): Identity()
+            )
+            (drop_path): Identity()
+            (layer_scale1): Identity()
+            (layer_scale2): Identity()
+          )
+        )
+      )
+      (7): Identity()
+    )
+  )
+  (decode_head): SegMANDecoder(
+    input_transform=multiple_select, ignore_index=255, align_corners=False
+    (loss_decode): CrossEntropyLoss(avg_non_ignore=True)
+    (conv_seg): Conv2d(128, 2, kernel_size=(1, 1), stride=(1, 1))
+    (dropout): Dropout2d(p=0.1, inplace=False)
+    (conv_downsample_2): ConvModule(
+      (conv): Conv2d(128, 256, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+      (bn): SyncBatchNorm(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (activate): ReLU(inplace=True)
+    )
+    (conv_downsample_4): ConvModule(
+      (conv): Conv2d(128, 512, kernel_size=(5, 5), stride=(4, 4), padding=(1, 1), bias=False)
+      (bn): SyncBatchNorm(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (activate): ReLU(inplace=True)
+    )
+    (linear_c4): MLP(
+      (proj): Linear(in_features=192, out_features=192, bias=True)
+    )
+    (linear_c3): MLP(
+      (proj): Linear(in_features=144, out_features=192, bias=True)
+    )
+    (linear_c2): MLP(
+      (proj): Linear(in_features=64, out_features=192, bias=True)
+    )
+    (linear_fuse): ConvModule(
+      (conv): Conv2d(576, 128, kernel_size=(1, 1), stride=(1, 1), bias=False)
+      (bn): SyncBatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (activate): ReLU(inplace=True)
+    )
+    (reduce_channels): ModuleList(
+      (0): ConvModule(
+        (conv): Conv2d(512, 128, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn): SyncBatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (activate): ReLU(inplace=True)
+      )
+      (1): ConvModule(
+        (conv): Conv2d(1024, 128, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn): SyncBatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (activate): ReLU(inplace=True)
+      )
+      (2): ConvModule(
+        (conv): Conv2d(2048, 128, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn): SyncBatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (activate): ReLU(inplace=True)
+      )
+    )
+    (vssm): VSSMBlock(
+      (norm1): LayerNorm2d((384,), eps=1e-06, elementwise_affine=True)
+      (cpe1): Conv2d(384, 384, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=384)
+      (token_mixer): VSSM()
+      (norm2): LayerNorm2d((384,), eps=1e-06, elementwise_affine=True)
+      (cpe2): Conv2d(384, 384, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=384)
+      (mlp): FFN(
+        (fc1): Conv2d(384, 1536, kernel_size=(1, 1), stride=(1, 1))
+        (act_layer): GELU(approximate='none')
+        (dwconv): Conv2d(1536, 1536, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=1536)
+        (fc2): Conv2d(1536, 384, kernel_size=(1, 1), stride=(1, 1))
+        (drop): Identity()
+      )
+      (drop_path): Identity()
+      (layer_scale1): Identity()
+      (layer_scale2): Identity()
+    )
+    (short_path): ConvModule(
+      (conv): Conv2d(128, 128, kernel_size=(1, 1), stride=(1, 1), bias=False)
+      (bn): SyncBatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (activate): ReLU(inplace=True)
+    )
+    (image_pool): Sequential(
+      (0): AdaptiveAvgPool2d(output_size=1)
+      (1): ConvModule(
+        (conv): Conv2d(128, 128, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (bn): SyncBatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (activate): ReLU(inplace=True)
+      )
+    )
+    (proj_out): ConvModule(
+      (conv): Conv2d(384, 192, kernel_size=(1, 1), stride=(1, 1), bias=False)
+      (bn): SyncBatchNorm(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (activate): ReLU(inplace=True)
+    )
+    (cat): ConvModule(
+      (conv): Conv2d(1216, 128, kernel_size=(1, 1), stride=(1, 1), bias=False)
+      (bn): SyncBatchNorm(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (activate): ReLU(inplace=True)
+    )
+  )
+  init_cfg={'type': 'Normal', 'std': 0.01, 'override': {'name': 'conv_seg'}}
+)/root/autodl-tmp/my_MambaVision-main/my_SegMAN-main-main/my_SegMAN-main-main/segmentation/tools/test.py:304: UserWarning: SyncBN is only supported with DDP. To be compatible with DP, we convert SyncBN to BN. Please use dist_train.sh which can avoid this error.
+  warnings.warn(
+
+[                                                  ] 0/20, elapsed: 0s, ETA:[>                                 ] 1/20, 0.6 task/s, elapsed: 2s, ETA:    30s[>>>                               ] 2/20, 1.2 task/s, elapsed: 2s, ETA:    15s[>>>>>                             ] 3/20, 1.8 task/s, elapsed: 2s, ETA:     9s[>>>>>>                            ] 4/20, 2.4 task/s, elapsed: 2s, ETA:     7s[>>>>>>>>                          ] 5/20, 2.9 task/s, elapsed: 2s, ETA:     5s[>>>>>>>>>>                        ] 6/20, 3.4 task/s, elapsed: 2s, ETA:     4s[>>>>>>>>>>>                       ] 7/20, 3.9 task/s, elapsed: 2s, ETA:     3s[>>>>>>>>>>>>>                     ] 8/20, 4.4 task/s, elapsed: 2s, ETA:     3s[>>>>>>>>>>>>>>>                   ] 9/20, 4.9 task/s, elapsed: 2s, ETA:     2s[>>>>>>>>>>>>>>>>                 ] 10/20, 5.3 task/s, elapsed: 2s, ETA:     2s[>>>>>>>>>>>>>>>>>>               ] 11/20, 5.7 task/s, elapsed: 2s, ETA:     2s[>>>>>>>>>>>>>>>>>>>              ] 12/20, 6.1 task/s, elapsed: 2s, ETA:     1s[>>>>>>>>>>>>>>>>>>>>>            ] 13/20, 6.5 task/s, elapsed: 2s, ETA:     1s[>>>>>>>>>>>>>>>>>>>>>>>          ] 14/20, 6.9 task/s, elapsed: 2s, ETA:     1s[>>>>>>>>>>>>>>>>>>>>>>>>         ] 15/20, 7.3 task/s, elapsed: 2s, ETA:     1s[>>>>>>>>>>>>>>>>>>>>>>>>>>       ] 16/20, 7.7 task/s, elapsed: 2s, ETA:     1s[>>>>>>>>>>>>>>>>>>>>>>>>>>>>     ] 17/20, 8.0 task/s, elapsed: 2s, ETA:     0s[>>>>>>>>>>>>>>>>>>>>>>>>>>>>>    ] 18/20, 8.4 task/s, elapsed: 2s, ETA:     0s[>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  ] 19/20, 8.7 task/s, elapsed: 2s, ETA:     0s[>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>] 20/20, 9.0 task/s, elapsed: 2s, ETA:     0sper class results:
+
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 99.13 | 99.21 |
+| foreground | 47.92 | 90.82 |
++------------+-------+-------+
+Summary:
+
++-------+-------+-------+
+|  aAcc |  mIoU |  mAcc |
++-------+-------+-------+
+| 99.13 | 73.52 | 95.02 |
++-------+-------+-------+

@@ -1,0 +1,12 @@
+# 权重与训练输出
+segmentation/pretrained/
+segmentation/checkpoints/
+**/*.pth
+**/*.pth.tar
+# selective_scan 本地编译
+kernels/selective_scan/build/
+**/*.so
+# Python 杂项
+__pycache__/
+*.py[cod]
+.DS_Store
